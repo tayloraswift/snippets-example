@@ -47,7 +47,7 @@ This should initialize a new Swift package with a `Package.swift` resembling the
 
 @Code(name: "Package.swift", file: Manifest.1.swift)
 
-Rename the library target to `Snippets Example`.
+Rename the library target to `SnippetsExample`.
 
 @Code(name: "Package.swift", file: Manifest.2.swift)
 
@@ -70,7 +70,7 @@ You should now have a directory structure that looks like this:
 ├── 📂 Snippets
 │   └── 📄 I.swift
 ├── 📂 Sources
-│   └── 📂 Snippets Example
+│   └── 📂 SnippetsExample
 │       └── 📄 anchor.swift
 ├── 📄 Package.swift
 └── 📄 .gitignore
@@ -123,10 +123,10 @@ Hi Barbie!
 
 Most modern documentation engines support embedding Snippets in Markdown documentation via the `@Snippet` block directive.
 
-Let’s create a documentation bundle for the `Snippets Example` target.
+Let’s create a documentation bundle for the `SnippetsExample` target.
 
 ```bash
-$ mkdir -p Sources/Snippets\ Example/docs.docc
+$ mkdir -p Sources/SnippetsExample/docs.docc
 ```
 
 >   Tip:
@@ -152,7 +152,7 @@ You should now have a project layout that looks like this:
 ├── 📂 Snippets
 │   └── 📄 I.swift
 ├── 📂 Sources
-│   └── 📂 Snippets Example
+│   └── 📂 SnippetsExample
 │       ├── 📂 docs.docc
 │       │   └── 📄 My article.md
 │       └── 📄 anchor.swift
@@ -170,10 +170,13 @@ Many developers find [DocC](https://github.com/apple/swift-docc) helpful for pre
 You can then launch DocC with the `preview-documentation` package subcommand:
 
 ```bash
-$ swift package --disable-sandbox preview-documentation --target Snippets\ Example
+$ swift package --disable-sandbox preview-documentation --target SnippetsExample
 ```
 
-You can find the rendered article at [`http://localhost:8080/documentation/snippets-example/my-article`](http://localhost:8080/documentation/snippets-example/my-article).
+You can find the rendered article at [`http://localhost:8080/documentation/snippetsexample/my-article`](http://localhost:8080/documentation/snippetsexample/my-article).
+
+>   Warning:
+>   At the time of writing, there is a [known bug](https://github.com/apple/swift-docc/issues/944) causing DocC preview to crash if the target name contains special characters.
 
 
 ## Using Snippet captions
@@ -188,11 +191,74 @@ When embedded, it should look like this:
 
 @Snippet(id: "II")
 
----
+>   Note:
+>   Snippet captions cannot embed other Snippets.
+
 
 ## Redacting parts of a Snippet
 
+You can redact portions of a Snippet using **slice directives**. A slice directive is a line comment token that starts with `snippet` followed by a dot and an identifier. The following identifiers have special meanings:
 
-## Embedding slices
+| Identifier        | Behavior                                   |
+| ----------------- | ------------------------------------------ |
+| `snippet.hide`    | Hides the content following the directive. |
+| `snippet.end`     | Hides the content following the directive. |
+| `snippet.show`    | Shows the content following the directive. |
 
-You can divide a Snippet into slices using slice directives. A slice directive is a comment that starts with `// snippet` followed by a dot and an identifier.
+
+Below is an example of a Snippet that uses redactions to hide the `import` statements.
+
+@Code(name: "III.swift", file: III.swift)
+
+When embedded, it should look like this:
+
+---
+
+@Snippet(id: "III")
+
+
+>   Warning:
+>   At the time of writing, there is a [known bug](https://github.com/apple/swift-docc/issues/946) preventing DocC from slicing Snippets that contain multi-line string literals correctly.
+
+
+### Slice indentation
+
+The indentation of the first `snippet.show` determines specifies the maximum amount of indentation to remove from the Snippet. In the example below, four spaces of indentation will be removed from the rendered Snippet. Note that the `snippet.end` token is required in order to prevent the Snippet from including the final brace, which would have prevented the indentation from being removed.
+
+@Code(name: "IV.swift", file: IV.swift)
+
+When embedded, it should look like this:
+
+---
+
+@Snippet(id: "IV")
+
+
+## Using named slices
+
+You can also use **named slices** to create Snippets with multiple embeddable sections. It’s a good idea to give slices uppercase names to distinguish them from special slice directives.
+
+Below is an example of a Snippet with a caption and three named slices.
+
+@Code(name: "V.swift", file: V.swift)
+
+Here’s how you might embed the slices in a Markdown article.
+
+@Code(name: "My article.md", file: "My article (6).md.txt")
+
+And here’s how the embedded slices should look.
+
+---
+
+@Snippet(id: "V", slice: DECLARATION)
+@Snippet(id: "V", slice: BODY)
+@Snippet(id: "V", slice: EXIT)
+
+
+## Rendering Snippets with linkable references
+
+Some documentation engines such as Unidoc support rendering Snippets with linked identifiers. This is possible because Snippets are compiled along with the rest of the package, allowing them to be mapped by [IndexStoreDB](https://github.com/apple/indexstore-db).
+
+Although DocC currently does not support previewing Snippets with linked symbols, platforms like Swiftinit will automatically link Snippet references when you publish your documentation on the internet. Third-party websites (such as Swift on Server itself) can also leverage this feature through the [Swiftinit API](https://swiftinit.org/help/exporting-articles).
+
+If your package is not yet indexed by Swiftinit, you can follow the instructions on the [Swiftinit website](https://swiftinit.org/help/self-serve) to add your package to the index.

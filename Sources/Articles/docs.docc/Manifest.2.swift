@@ -6,9 +6,9 @@ import PackageDescription
 let package = Package(
     name: "Swift Snippets",
     products: [
-        .library(name: "Snippets Example", targets: ["Snippets Example"]),
+        .library(name: "SnippetsExample", targets: ["SnippetsExample"]),
     ],
     targets: [
-        .target(name: "Snippets Example"),
+        .target(name: "SnippetsExample"),
     ]
 )

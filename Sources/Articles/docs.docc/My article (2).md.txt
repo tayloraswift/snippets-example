@@ -1,1 +1,1 @@
-../../Snippets Example/docs.docc/My article (2).md
+../../SnippetsExample/docs.docc/My article (2).md
