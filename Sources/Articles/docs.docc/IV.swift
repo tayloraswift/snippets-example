@@ -1,5 +1,3 @@
-//
-
 // snippet.DECLARATION
 func f() -> Int
 {

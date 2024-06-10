@@ -134,9 +134,16 @@ $ mkdir -p Sources/Snippets\ Example/docs.docc
 
 Create a markdown article named `My article.md` in the `docs.docc` directory.
 
+@Code(name: "My article.md", file: "My article (2).md.txt")
+
+In the example above, we have specified the Snippet to include by `path` identity. Despite its naming, the `path` syntax is not a file path. The first component is the name of the package **as specified by the ``PackageDescription/Package/name`` field in the manifest**. The second component is always the string `Snippets`. The third component is the Snippet ID, which is the name of the Snippet file without the `.swift` extension. If the Snippet ID contains special characters, you should pass the ID as-is, without replacing any characters.
+
+Some documentation engines such as Unidoc support referencing Snippets by `id`.
+
 @Code(name: "My article.md", file: "My article (1).md.txt")
 
-If the Snippet ID contains special characters, you should pass the ID as-is, without replacing any characters.
+>   Important:
+>   DocC does not currently support referencing Snippets by ID. Instead, you must use the fully-qualified `path` syntax to reference a Snippet.
 
 You should now have a project layout that looks like this:
 
@@ -156,26 +163,36 @@ You should now have a project layout that looks like this:
 
 ### Previewing Snippets with DocC
 
-Many developers find [DocC](https://github.com/apple/swift-docc) helpful for previewing documentation locally.
-
-To use DocC, add the [swift-docc-plugin](https://github.com/apple/swift-docc-plugin) to the package manifest.
+Many developers find [DocC](https://github.com/apple/swift-docc) helpful for previewing documentation locally. To use DocC, add the [swift-docc-plugin](https://github.com/apple/swift-docc-plugin) to the package manifest.
 
 @Code(name: "Package.swift", file: Manifest.3.swift)
 
->   Important:
->   DocC does not currently support referencing Snippets by ID. Instead, you must use the fully-qualified `path` syntax to reference a Snippet.
->
->   Despite its naming, the `path` syntax is not a file path. The first component is the name of the package **as specified by the ``PackageDescription/Package/name`` field in the manifest**. The second component is always the string `Snippets`. The third component is the name of the Snippet file without the `.swift` extension.
+You can then launch DocC with the `preview-documentation` package subcommand:
 
-@Code(name: "My article.md", file: "My article (2).md.txt")
+```bash
+$ swift package --disable-sandbox preview-documentation --target Snippets\ Example
+```
+
+You can find the rendered article at [`http://localhost:8080/documentation/snippets-example/my-article`](http://localhost:8080/documentation/snippets-example/my-article).
 
 
 ## Using Snippet captions
 
+If a Snippet begins with contiguous line comments, those comments will be parsed as Markdown and treated as a Snippet caption. Try adding the following code to a Snippet named `II.swift`.
+
+@Code(name: "II.swift", file: II.swift)
+
+When embedded, it should look like this:
+
+---
+
+@Snippet(id: "II")
+
+---
+
+## Redacting parts of a Snippet
 
 
 ## Embedding slices
 
 You can divide a Snippet into slices using slice directives. A slice directive is a comment that starts with `// snippet` followed by a dot and an identifier.
-
-@Snippet(id: II)

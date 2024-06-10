@@ -1,7 +1,5 @@
 # My article
 
-This is a simple article that demonstrates how to use snippets in documentation.
-
-@Snippet(path: "Swift Snippets/Snippets/I")
+This is a simple article that demonstrates how to embed a Snippet with a caption.
 
 @Snippet(path: "Swift Snippets/Snippets/II")
